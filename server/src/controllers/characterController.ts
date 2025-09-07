@@ -1,46 +1,56 @@
 import type { Request, Response, NextFunction } from "express";
-import { characters, type Character } from "../models/character.ts";
+import { type Character } from "../models/character.ts";
+import {
+  findAllCharacters,
+  findCharacterById,
+  findCharacterByIdAndDelete,
+  saveNewCharacter,
+  updateCharacterById,
+} from "../services/characterService.ts";
+import mongoose from "mongoose";
 
-export const addNewCharacter = (
+export const addNewCharacter = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const { name } = req.body;
-    const newCharacter: Character = {
-      id: Date.now(),
-      name,
-      class: "priest",
-      level: 10,
-    };
-    characters.push(newCharacter);
+    const { name, level } = req.body;
+    //FIXME: temporary. This will only take character name, realm and regoion and then make the request to blizzards api and then create a new character in the db with the fetched character.
+    const newCharacter = await saveNewCharacter(name, level);
     res.status(201).json(newCharacter);
   } catch (error) {
     next(error);
   }
 };
 
-export const getAllCharacters = (
+export const getAllCharacters = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
+    const characters: Character[] = await findAllCharacters();
+    if (!characters) {
+      res.status(404).json({ message: "Could not find characters" });
+      return;
+    }
     res.json(characters);
   } catch (error) {
     next(error);
   }
 };
 
-export const getCharacterById = (
+export const getCharacterById = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const id = parseInt(req.params.id!, 10);
-    const character = characters.find((i) => i.id === id);
+    const id: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(
+      req.params.id!,
+    );
+    const character: Character | null = await findCharacterById(id);
     if (!character) {
       res.status(404).json({ message: "Character not found" });
       return;
@@ -57,15 +67,12 @@ export const updateCharacter = (
   next: NextFunction,
 ) => {
   try {
-    const id = parseInt(req.params.id!, 10);
+    const id: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(
+      req.params.id!,
+    );
     const { name } = req.body;
-    const charIndex = characters.findIndex((i) => i.id === id);
-    if (charIndex === -1) {
-      res.status(404).json({ message: "Character not found" });
-      return;
-    }
-    characters[charIndex]!.name = name;
-    res.json(characters[charIndex]);
+    const updatedCharacter = updateCharacterById(id, name);
+    res.json(updatedCharacter);
   } catch (error) {
     next(error);
   }
@@ -77,13 +84,10 @@ export const deleteCharacter = (
   next: NextFunction,
 ) => {
   try {
-    const id = parseInt(req.params.id!, 10);
-    const charIndex = characters.findIndex((i) => i.id === id);
-    if (charIndex === -1) {
-      res.status(404).json({ message: "Character not found" });
-      return;
-    }
-    const deletedCharacter = characters.splice(charIndex, 1)[0];
+    const id: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(
+      req.params.id!,
+    );
+    const deletedCharacter = findCharacterByIdAndDelete(id);
     res.json(deletedCharacter);
   } catch (error) {
     next(error);

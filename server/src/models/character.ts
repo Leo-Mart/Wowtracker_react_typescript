@@ -1,20 +1,11 @@
-export interface Character {
-  id: number;
-  name: string;
-  class: string;
-  level: number;
-}
-
-export let characters: Character[] = [];
-
 import mongoose, { Schema, Document } from "mongoose";
 
-interface CharacterTest extends Document {
+export interface Character extends Document {
   name: string;
   level: number;
 }
 
-const characterSchema: Schema = new Schema<CharacterTest>({
+const characterSchema: Schema = new Schema<Character>({
   name: { type: String, required: true },
   level: { type: Number, required: true },
 });
