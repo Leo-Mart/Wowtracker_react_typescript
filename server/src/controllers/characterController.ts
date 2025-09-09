@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { type Character } from "../models/character.ts";
+import { type ICharacter } from "../models/character.ts";
 import {
   findAllCharacters,
   findCharacterById,
@@ -15,9 +15,8 @@ export const addNewCharacter = async (
   next: NextFunction,
 ) => {
   try {
-    const { name, level } = req.body;
-    //FIXME: temporary. This will only take character name, realm and regoion and then make the request to blizzards api and then create a new character in the db with the fetched character.
-    const newCharacter = await saveNewCharacter(name, level);
+    const { name, realm, region } = req.body;
+    const newCharacter = await saveNewCharacter(name, realm, region);
     res.status(201).json(newCharacter);
   } catch (error) {
     next(error);
@@ -30,7 +29,7 @@ export const getAllCharacters = async (
   next: NextFunction,
 ) => {
   try {
-    const characters: Character[] = await findAllCharacters();
+    const characters: ICharacter[] = await findAllCharacters();
     if (!characters) {
       res.status(404).json({ message: "Could not find characters" });
       return;
@@ -50,7 +49,7 @@ export const getCharacterById = async (
     const id: mongoose.Types.ObjectId = new mongoose.Types.ObjectId(
       req.params.id!,
     );
-    const character: Character | null = await findCharacterById(id);
+    const character: ICharacter | null = await findCharacterById(id);
     if (!character) {
       res.status(404).json({ message: "Character not found" });
       return;
@@ -93,24 +92,3 @@ export const deleteCharacter = (
     next(error);
   }
 };
-
-const getCharacterProfileSummary = async (
-  accessToken: string,
-  characterName: string,
-  characterRealm: string,
-  characterRegion: string,
-) => {
-  const response = await fetch(
-    `https://${characterRegion}.api.blizzard.com/profile/wow/character/${characterRealm}/${characterName}?namespace=profile-eu&locale=en_GB`,
-    {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    },
-  );
-  const data = await response.json();
-
-  console.log(data);
-};
-
-//const token: BlizzardAccessToken = await GetBlizzardAPIToken();
-
-//getCharacterProfileSummary(token.AccessToken, "ashir", "shadowsong", "eu");
