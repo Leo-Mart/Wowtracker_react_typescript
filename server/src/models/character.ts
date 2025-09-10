@@ -8,6 +8,12 @@ export interface ICharacter extends Document {
   race: string;
   class: string;
   spec: string;
+  assets: [
+    {
+      key: string;
+      value: string;
+    },
+  ];
 }
 
 const characterSchema: Schema = new Schema<ICharacter>({
@@ -18,6 +24,12 @@ const characterSchema: Schema = new Schema<ICharacter>({
   race: { type: String, required: true },
   class: { type: String, required: true },
   spec: { type: String, required: true },
+  assets: [
+    {
+      key: { type: String },
+      value: { type: String },
+    },
+  ],
 });
 
 const Character = mongoose.model("Character", characterSchema);

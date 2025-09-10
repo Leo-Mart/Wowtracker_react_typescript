@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import type { HydratedDocument } from "mongoose";
 import Character, { type ICharacter } from "../models/character.ts";
 import { GetBlizzardAPIToken } from "../utils/helpers.ts";
 
@@ -19,6 +18,15 @@ interface characterProfileResponse {
   active_spec: {
     name: string;
   };
+}
+
+interface asset {
+  key: string;
+  value: string;
+}
+
+interface characterMediaResponse {
+  assets: Array<asset>;
 }
 
 export const findAllCharacters = async (): Promise<ICharacter[]> => {
@@ -42,9 +50,9 @@ export const saveNewCharacter = async (
   realm: string,
   region: string,
 ) => {
-  // fetch character data from Bliizards api
   const token = await GetBlizzardAPIToken();
 
+  // fetch character summary from Bliizards api
   const characterProfile = await getCharacterProfileSummary(
     token.AccessToken,
     name,
@@ -52,6 +60,16 @@ export const saveNewCharacter = async (
     region,
   );
 
+  //Fetch characters media from blizzards api
+  const media = await getCharacterMedia(token.AccessToken, name, realm, region);
+
+  // Fetch characters keystone profile from blizzards api
+  await getCharacterKeystoneProfile(token.AccessToken, name, realm, region);
+  // fetch characters gear/equipment from blizzards api
+  await getCharacterGear(token.AccessToken, name, realm, region);
+  // fetch characters spec info from blizzards api
+
+  //TODO: fix spec endpoint, getting wrong info as it is. Should use the 'specializations' field not active_spec
   const newCharacter = new Character({
     name: characterProfile.name,
     level: characterProfile.level,
@@ -60,6 +78,7 @@ export const saveNewCharacter = async (
     race: characterProfile.race.name,
     class: characterProfile.character_class.name,
     spec: characterProfile.active_spec.name,
+    assets: media.assets,
   });
 
   const savedCharacter = await newCharacter.save();
@@ -80,7 +99,6 @@ export const updateCharacterById = async (
 export const findCharacterByIdAndDelete = async (
   id: mongoose.Types.ObjectId,
 ) => {
-  //FIXME: PROMISE DOCUMENT UNKNOWN, check for correct type. HydratedDocument?
   const deletedCharacter = await Character.findByIdAndDelete(id);
   return deletedCharacter;
 };
@@ -98,6 +116,64 @@ const getCharacterProfileSummary = async (
     },
   );
   const data = (await response.json()) as characterProfileResponse;
+  //FIXME: Fix return object only returning fields I need?
 
+  return data;
+};
+
+const getCharacterKeystoneProfile = async (
+  accessToken: string,
+  characterName: string,
+  characterRealm: string,
+  characterRegion: string,
+) => {
+  const response = await fetch(
+    `https://${characterRegion}.api.blizzard.com/profile/wow/character/${characterRealm}/${characterName}/mythic-keystone-profile?namespace=profile-eu`,
+    {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    },
+  );
+
+  const data = await response.json();
+
+  console.log("Keystone: ", data);
+  // TODO: fix return
+};
+
+const getCharacterGear = async (
+  accessToken: string,
+  characterName: string,
+  characterRealm: string,
+  characterRegion: string,
+) => {
+  const response = await fetch(
+    `https://${characterRegion}.api.blizzard.com/profile/wow/character/${characterRealm}/${characterName}/equipment?namespace=profile-eu`,
+    {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    },
+  );
+
+  const data = await response.json();
+
+  console.log("Gear: ", data);
+  // TODO: fix return
+};
+
+const getCharacterMedia = async (
+  accessToken: string,
+  characterName: string,
+  characterRealm: string,
+  characterRegion: string,
+): Promise<characterMediaResponse> => {
+  const response = await fetch(
+    `https://${characterRegion}.api.blizzard.com/profile/wow/character/${characterRealm}/${characterName}/character-media?namespace=profile-eu`,
+    {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    },
+  );
+
+  const data = (await response.json()) as characterMediaResponse;
+
+  //FIXME: Fix return object only returning fields I need?
   return data;
 };
