@@ -1,78 +1,12 @@
 import mongoose from "mongoose";
-import Character, {
-  type ICharacter,
-  type keystoneProfileCurrentSeason,
-} from "../models/character.ts";
+import Character, { type ICharacter } from "../models/character.ts";
+import type {
+  characterProfileResponse,
+  characterMediaResponse,
+  characterMplusProfileResponse,
+  characterGearResponse,
+} from "../types/types.ts";
 import { GetBlizzardAPIToken } from "../utils/helpers.ts";
-
-interface characterProfileResponse {
-  name: string;
-  level: number;
-  equipped_item_level: number;
-  faction: {
-    name: string;
-  };
-  race: {
-    name: string;
-  };
-  character_class: {
-    name: string;
-  };
-  active_spec: {
-    name: string;
-  };
-}
-// TODO: Break out these types/intarfaces to its own file.
-export interface characterMplusProfileResponse {
-  best_runs: [
-    {
-      completed_timestamp: number;
-      duration: number;
-      keystone_level: number;
-      keystone_affixes: [
-        {
-          name: string;
-        },
-      ];
-      members: [
-        {
-          character: {
-            name: string;
-          };
-          specialization: {
-            name: string;
-          };
-          race: {
-            name: string;
-          };
-          equipped_item_level: number;
-        },
-      ];
-      dungeon: {
-        name: string;
-        id: number;
-      };
-      is_completed_within_time: boolean;
-      mythic_rating: {
-        rating: string;
-      };
-    },
-  ];
-  mythic_rating: {
-    rating: number;
-  };
-}
-
-interface characterGearResponse {}
-
-interface asset {
-  key: string;
-  value: string;
-}
-
-interface characterMediaResponse {
-  assets: Array<asset>;
-}
 
 export const findAllCharacters = async (): Promise<ICharacter[]> => {
   const characters: ICharacter[] = await Character.find();
@@ -119,7 +53,12 @@ export const saveNewCharacter = async (
       15,
     );
   // fetch characters gear/equipment from blizzards api
-  await getCharacterGear(token.AccessToken, name, realm, region);
+  const characterGear: characterGearResponse = await getCharacterGear(
+    token.AccessToken,
+    name,
+    realm,
+    region,
+  );
   // fetch characters spec info from blizzards api
 
   //TODO: fix spec endpoint, getting wrong info as it is. Should use the 'specializations' field not active_spec
@@ -131,6 +70,7 @@ export const saveNewCharacter = async (
     race: characterProfile.race.name,
     class: characterProfile.character_class.name,
     spec: characterProfile.active_spec.name,
+    character_gear: characterGear.equipped_items,
     keystoneProfileCurrentSeason: keyRuns,
     assets: media.assets,
   });
@@ -198,17 +138,17 @@ const getCharacterGear = async (
   characterName: string,
   characterRealm: string,
   characterRegion: string,
-) => {
+): Promise<characterGearResponse> => {
   const response = await fetch(
-    `https://${characterRegion}.api.blizzard.com/profile/wow/character/${characterRealm}/${characterName}/equipment?namespace=profile-eu`,
+    `https://${characterRegion}.api.blizzard.com/profile/wow/character/${characterRealm}/${characterName}/equipment?namespace=profile-eu&locale=en_GB`,
     {
       headers: { Authorization: `Bearer ${accessToken}` },
     },
   );
 
-  const data = await response.json();
+  const data = (await response.json()) as characterGearResponse;
 
-  // TODO: fix return
+  return data;
 };
 
 const getCharacterMedia = async (

@@ -8,7 +8,54 @@ export interface ICharacter extends Document {
   race: string;
   class: string;
   spec: string;
-  keystoneProfileCurrentSeason: keystoneProfileCurrentSeason;
+  character_gear: [
+    {
+      item: {
+        id: number;
+      };
+      name: string;
+    },
+  ];
+  keystoneProfileCurrentSeason: {
+    bestRuns: [
+      {
+        completed_timestamp: number;
+        duration: number;
+        keystone_level: number;
+        keystone_affixes: [
+          {
+            id: number;
+            name: string;
+          },
+        ];
+        members: [
+          {
+            character: {
+              name: string;
+            };
+            specialization: {
+              name: string;
+            };
+            race: {
+              name: string;
+            };
+            equippedItemLevel: number;
+          },
+        ];
+        dungeon: {
+          name: string;
+          id: number;
+        };
+        is_completed_within_time: boolean;
+        mythic_rating: {
+          rating: number;
+        };
+      },
+    ];
+    mythic_rating: {
+      rating: number;
+    };
+  };
   assets: [
     {
       key: string;
@@ -17,43 +64,7 @@ export interface ICharacter extends Document {
   ];
 }
 
-export interface keystoneProfileCurrentSeason {
-  bestRuns: [
-    {
-      completedAt: number;
-      duration: number;
-      keystoneLevel: number;
-      affixes: [
-        {
-          name: string;
-        },
-      ];
-      members: [
-        {
-          character: {
-            name: string;
-          };
-          specialization: {
-            name: string;
-          };
-          race: {
-            name: string;
-          };
-          equippedItemLevel: number;
-        },
-      ];
-      dungeon: {
-        name: string;
-        id: number;
-      };
-      completedInTime: boolean;
-      earnedRating: {
-        rating: number;
-      };
-    },
-  ];
-  currentMythicRating: number;
-}
+//TODO: clean up the names of the model a bit, make sure case matches
 
 const characterSchema: Schema = new Schema<ICharacter>({
   name: { type: String, required: true },
@@ -63,14 +74,23 @@ const characterSchema: Schema = new Schema<ICharacter>({
   race: { type: String, required: true },
   class: { type: String, required: true },
   spec: { type: String, required: true },
+  character_gear: [
+    {
+      item: {
+        id: { type: Number },
+      },
+      name: { type: String },
+    },
+  ],
   keystoneProfileCurrentSeason: {
     best_runs: [
       {
-        completedAt: { type: Number },
+        completed_timestamp: { type: Number },
         duration: { type: Number },
-        keystoneLevel: { type: Number },
-        affixes: [
+        keystone_level: { type: Number },
+        keystone_affixes: [
           {
+            id: { type: Number },
             name: { type: String },
           },
         ],
@@ -92,13 +112,15 @@ const characterSchema: Schema = new Schema<ICharacter>({
           name: { type: String },
           id: { type: Number },
         },
-        completedInTime: { type: Boolean },
-        earnedRating: {
+        is_completed_within_time: { type: Boolean },
+        mythic_rating: {
           rating: { type: Number },
         },
       },
     ],
-    currentMythicRating: { type: Number },
+    mythic_rating: {
+      rating: { type: Number },
+    },
   },
   assets: [
     {
