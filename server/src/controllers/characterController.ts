@@ -17,7 +17,7 @@ export const addNewCharacter = async (
   try {
     const { name, realm, region } = req.body;
     const newCharacter = await saveNewCharacter(name, realm, region);
-    res.status(201).json(newCharacter);
+    res.status(201);
   } catch (error) {
     next(error);
   }

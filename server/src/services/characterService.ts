@@ -1,5 +1,8 @@
 import mongoose from "mongoose";
-import Character, { type ICharacter } from "../models/character.ts";
+import Character, {
+  type ICharacter,
+  type keystoneProfileCurrentSeason,
+} from "../models/character.ts";
 import { GetBlizzardAPIToken } from "../utils/helpers.ts";
 
 interface characterProfileResponse {
@@ -19,6 +22,48 @@ interface characterProfileResponse {
     name: string;
   };
 }
+// TODO: Break out these types/intarfaces to its own file.
+export interface characterMplusProfileResponse {
+  best_runs: [
+    {
+      completed_timestamp: number;
+      duration: number;
+      keystone_level: number;
+      keystone_affixes: [
+        {
+          name: string;
+        },
+      ];
+      members: [
+        {
+          character: {
+            name: string;
+          };
+          specialization: {
+            name: string;
+          };
+          race: {
+            name: string;
+          };
+          equipped_item_level: number;
+        },
+      ];
+      dungeon: {
+        name: string;
+        id: number;
+      };
+      is_completed_within_time: boolean;
+      mythic_rating: {
+        rating: string;
+      };
+    },
+  ];
+  mythic_rating: {
+    rating: number;
+  };
+}
+
+interface characterGearResponse {}
 
 interface asset {
   key: string;
@@ -53,18 +98,26 @@ export const saveNewCharacter = async (
   const token = await GetBlizzardAPIToken();
 
   // fetch character summary from Bliizards api
-  const characterProfile = await getCharacterProfileSummary(
+  const characterProfile: characterProfileResponse =
+    await getCharacterProfileSummary(token.AccessToken, name, realm, region);
+
+  //Fetch characters media from blizzards api
+  const media: characterMediaResponse = await getCharacterMedia(
     token.AccessToken,
     name,
     realm,
     region,
   );
 
-  //Fetch characters media from blizzards api
-  const media = await getCharacterMedia(token.AccessToken, name, realm, region);
-
   // Fetch characters keystone profile from blizzards api
-  await getCharacterKeystoneProfile(token.AccessToken, name, realm, region);
+  const keyRuns: characterMplusProfileResponse =
+    await getCharacterMythicPlusProfileForCurrentSeason(
+      token.AccessToken,
+      name,
+      realm,
+      region,
+      15,
+    );
   // fetch characters gear/equipment from blizzards api
   await getCharacterGear(token.AccessToken, name, realm, region);
   // fetch characters spec info from blizzards api
@@ -78,9 +131,9 @@ export const saveNewCharacter = async (
     race: characterProfile.race.name,
     class: characterProfile.character_class.name,
     spec: characterProfile.active_spec.name,
+    keystoneProfileCurrentSeason: keyRuns,
     assets: media.assets,
   });
-
   const savedCharacter = await newCharacter.save();
 
   return savedCharacter;
@@ -121,23 +174,23 @@ const getCharacterProfileSummary = async (
   return data;
 };
 
-const getCharacterKeystoneProfile = async (
+const getCharacterMythicPlusProfileForCurrentSeason = async (
   accessToken: string,
   characterName: string,
   characterRealm: string,
   characterRegion: string,
-) => {
+  currentMplusSeason: number,
+): Promise<characterMplusProfileResponse> => {
   const response = await fetch(
-    `https://${characterRegion}.api.blizzard.com/profile/wow/character/${characterRealm}/${characterName}/mythic-keystone-profile?namespace=profile-eu`,
+    `https://${characterRegion}.api.blizzard.com/profile/wow/character/${characterRealm}/${characterName}/mythic-keystone-profile/season/${currentMplusSeason}?namespace=profile-eu&locale=en_GB`,
     {
       headers: { Authorization: `Bearer ${accessToken}` },
     },
   );
 
-  const data = await response.json();
+  const data = (await response.json()) as characterMplusProfileResponse;
 
-  console.log("Keystone: ", data);
-  // TODO: fix return
+  return data;
 };
 
 const getCharacterGear = async (
@@ -155,7 +208,6 @@ const getCharacterGear = async (
 
   const data = await response.json();
 
-  console.log("Gear: ", data);
   // TODO: fix return
 };
 
