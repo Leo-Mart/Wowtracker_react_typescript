@@ -3,11 +3,19 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface ICharacter extends Document {
   name: string;
   level: number;
-  itemLevelEquipped: number;
-  faction: string;
-  race: string;
-  class: string;
-  spec: string;
+  equipped_item_level: number;
+  faction: {
+    name: string;
+  };
+  race: {
+    name: string;
+  };
+  character_class: {
+    name: string;
+  };
+  active_spec: {
+    name: string;
+  };
   character_gear: [
     {
       item: {
@@ -69,11 +77,19 @@ export interface ICharacter extends Document {
 const characterSchema: Schema = new Schema<ICharacter>({
   name: { type: String, required: true },
   level: { type: Number, required: true },
-  itemLevelEquipped: { type: Number, required: true },
-  faction: { type: String, required: true },
-  race: { type: String, required: true },
-  class: { type: String, required: true },
-  spec: { type: String, required: true },
+  equipped_item_level: { type: Number, required: true },
+  faction: {
+    name: { type: String, required: true },
+  },
+  race: {
+    name: { type: String, required: true },
+  },
+  character_class: {
+    name: { type: String, required: true },
+  },
+  active_spec: {
+    name: { type: String, required: true },
+  },
   character_gear: [
     {
       item: {
