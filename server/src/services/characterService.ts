@@ -5,6 +5,7 @@ import type {
   characterMediaResponse,
   characterMplusProfileResponse,
   characterGearResponse,
+  characterSpecializationsResponse,
 } from "../types/types.ts";
 import { GetBlizzardAPIToken } from "../utils/helpers.ts";
 
@@ -60,8 +61,9 @@ export const saveNewCharacter = async (
     region,
   );
   // fetch characters spec info from blizzards api
+  const characterSpecializations: characterSpecializationsResponse =
+    await getCharacterSpecializations(token.AccessToken, name, realm, region);
 
-  //TODO: fix spec endpoint, getting wrong info as it is. Should use the 'specializations' field not active_spec
   const newCharacter = new Character({
     name: characterProfile.name,
     level: characterProfile.level,
@@ -72,6 +74,7 @@ export const saveNewCharacter = async (
     active_spec: characterProfile.active_spec,
     character_gear: characterGear.equipped_items,
     keystoneProfileCurrentSeason: keyRuns,
+    specializations: characterSpecializations.specializations,
     assets: media.assets,
   });
   const savedCharacter = await newCharacter.save();
@@ -79,6 +82,7 @@ export const saveNewCharacter = async (
   return savedCharacter;
 };
 
+//TODO: update to actually do something :D
 export const updateCharacterById = async (
   id: mongoose.Types.ObjectId,
   name: string,
@@ -109,7 +113,6 @@ const getCharacterProfileSummary = async (
     },
   );
   const data = (await response.json()) as characterProfileResponse;
-  //FIXME: Fix return object only returning fields I need?
 
   return data;
 };
@@ -129,6 +132,24 @@ const getCharacterMythicPlusProfileForCurrentSeason = async (
   );
 
   const data = (await response.json()) as characterMplusProfileResponse;
+
+  return data;
+};
+
+const getCharacterSpecializations = async (
+  accessToken: string,
+  characterName: string,
+  characterRealm: string,
+  characterRegion: string,
+): Promise<characterSpecializationsResponse> => {
+  const response = await fetch(
+    `https://${characterRegion}.api.blizzard.com/profile/wow/character/${characterRealm}/${characterName}/specializations?namespace=profile-eu&locale=en_GB`,
+    {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    },
+  );
+
+  const data = (await response.json()) as characterSpecializationsResponse;
 
   return data;
 };
@@ -166,6 +187,5 @@ const getCharacterMedia = async (
 
   const data = (await response.json()) as characterMediaResponse;
 
-  //FIXME: Fix return object only returning fields I need?
   return data;
 };

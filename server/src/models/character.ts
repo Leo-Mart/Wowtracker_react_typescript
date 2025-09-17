@@ -64,6 +64,55 @@ export interface ICharacter extends Document {
       rating: number;
     };
   };
+  specializations: [
+    {
+      specialization: {
+        name: string;
+      };
+      loadouts: [
+        {
+          is_active: boolean;
+          talent_loadout_code: string;
+          selected_class_talents: [
+            {
+              tooltip: {
+                spell_tooltip: {
+                  spell: {
+                    name: string;
+                    id: number;
+                  };
+                };
+              };
+            },
+          ];
+          selected_spec_talents: [
+            {
+              tooltip: {
+                spell_tooltip: {
+                  spell: {
+                    name: string;
+                    id: number;
+                  };
+                };
+              };
+            },
+          ];
+          selected_hero_talents: [
+            {
+              tooltip: {
+                spell_tooltip: {
+                  spell: {
+                    name: string;
+                    id: number;
+                  };
+                };
+              };
+            },
+          ];
+        },
+      ];
+    },
+  ];
   assets: [
     {
       key: string;
@@ -72,7 +121,7 @@ export interface ICharacter extends Document {
   ];
 }
 
-//TODO: clean up the names of the model a bit, make sure case matches
+//TODO: Clean up/refactor the model at some point. the specializations array is especially egrious, don't need to dig that deep. Could probably just move the spell object to the top or something
 
 const characterSchema: Schema = new Schema<ICharacter>({
   name: { type: String, required: true },
@@ -90,6 +139,55 @@ const characterSchema: Schema = new Schema<ICharacter>({
   active_spec: {
     name: { type: String, required: true },
   },
+  specializations: [
+    {
+      specialization: {
+        name: { type: String },
+      },
+      loadouts: [
+        {
+          is_active: { type: Boolean },
+          talent_loadout_code: { type: String },
+          selected_class_talents: [
+            {
+              tooltip: {
+                spell_tooltip: {
+                  spell: {
+                    name: { type: String },
+                    id: { type: Number },
+                  },
+                },
+              },
+            },
+          ],
+          selected_spec_talents: [
+            {
+              tooltip: {
+                spell_tooltip: {
+                  spell: {
+                    name: { type: String },
+                    id: { type: Number },
+                  },
+                },
+              },
+            },
+          ],
+          selected_hero_talents: [
+            {
+              tooltip: {
+                spell_tooltip: {
+                  spell: {
+                    name: { type: String },
+                    id: { type: Number },
+                  },
+                },
+              },
+            },
+          ],
+        },
+      ],
+    },
+  ],
   character_gear: [
     {
       item: {

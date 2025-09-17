@@ -57,6 +57,58 @@ export interface characterMplusProfileResponse {
   };
 }
 
+export interface characterSpecializationsResponse {
+  specializations: [
+    {
+      specialization: {
+        name: string;
+      };
+      loadouts: [
+        {
+          is_active: boolean;
+          talent_loadout_code: string;
+          selected_class_talents: [
+            {
+              tooltip: {
+                spell_tooltip: {
+                  spell: {
+                    name: string;
+                    id: number;
+                  };
+                };
+              };
+            },
+          ];
+          selected_spec_talents: [
+            {
+              tooltip: {
+                spell_tooltip: {
+                  spell: {
+                    name: string;
+                    id: number;
+                  };
+                };
+              };
+            },
+          ];
+          selected_hero_talents: [
+            {
+              tooltip: {
+                spell_tooltip: {
+                  spell: {
+                    name: string;
+                    id: number;
+                  };
+                };
+              };
+            },
+          ];
+        },
+      ];
+    },
+  ];
+}
+
 export interface characterGearResponse {
   equipped_items: [
     {
