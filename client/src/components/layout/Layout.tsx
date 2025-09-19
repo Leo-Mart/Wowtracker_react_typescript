@@ -1,3 +1,4 @@
+import Footer from "../shared/Footer";
 import Header from "../shared/Header";
 
 interface Props {
@@ -9,6 +10,7 @@ const Layout = ({ children }: Props) => {
     <>
       <Header />
       <main>{children}</main>
+      <Footer />
     </>
   );
 };

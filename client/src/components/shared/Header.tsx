@@ -24,7 +24,7 @@ const Header = () => {
             <li>
               <a
                 className="block rounded-md px-5 py-2.5 text-sm font-medium text-emerald-600 transition hover:bg-emerald-700 dark:hover:bg-emerald-500 dark:hover:text-white"
-                href="/"
+                href="/import-character"
               >
                 Import New Character
               </a>
