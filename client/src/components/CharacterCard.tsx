@@ -1,27 +1,17 @@
 interface Character {
   name: string;
   level: number;
-  realm: string;
   playerClass: string;
   avatarImg: string;
 }
 
-const CharacterCard = ({
-  name,
-  level,
-  realm,
-  playerClass,
-  avatarImg,
-}: Character) => {
+const CharacterCard = ({ name, level, playerClass, avatarImg }: Character) => {
   return (
     <>
-      <div
-        className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700"
-        style={{ backgroundImage: `${avatarImg}` }}
-      >
+      <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
         <div>
           <img
-            className="rounded-t-lg"
+            className="rounded-t-lg w-full"
             src={avatarImg}
             alt="image of the character"
           />
@@ -32,9 +22,6 @@ const CharacterCard = ({
               {`${name} | ${level} ${playerClass}`}
             </h5>
           </div>
-          <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
-            {realm}
-          </p>
         </div>
       </div>
     </>

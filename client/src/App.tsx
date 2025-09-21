@@ -1,12 +1,15 @@
 import Layout from "./components/layout/Layout";
+import CharacterContextProvider from "./context/CharacterContext";
 import Router from "./routes/routes";
 
 function App() {
   return (
     <>
-      <Layout>
-        <Router />
-      </Layout>
+      <CharacterContextProvider>
+        <Layout>
+          <Router />
+        </Layout>
+      </CharacterContextProvider>
     </>
   );
 }

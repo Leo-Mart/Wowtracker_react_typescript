@@ -1,6 +1,4 @@
-// Return types
-
-export interface characterProfileResponse {
+export interface ICharacter {
   name: string;
   level: number;
   equipped_item_level: number;
@@ -16,48 +14,54 @@ export interface characterProfileResponse {
   active_spec: {
     name: string;
   };
-}
-export interface characterMplusProfileResponse {
-  best_runs: [
+  character_gear: [
     {
-      completed_timestamp: number;
-      duration: number;
-      keystone_level: number;
-      keystone_affixes: [
-        {
-          name: string;
-        },
-      ];
-      members: [
-        {
-          character: {
-            name: string;
-          };
-          specialization: {
-            name: string;
-          };
-          race: {
-            name: string;
-          };
-          equipped_item_level: number;
-        },
-      ];
-      dungeon: {
-        name: string;
+      item: {
         id: number;
       };
-      is_completed_within_time: boolean;
-      mythic_rating: {
-        rating: string;
-      };
+      name: string;
     },
   ];
-  mythic_rating: {
-    rating: number;
+  keystoneProfileCurrentSeason: {
+    bestRuns: [
+      {
+        completed_timestamp: number;
+        duration: number;
+        keystone_level: number;
+        keystone_affixes: [
+          {
+            id: number;
+            name: string;
+          },
+        ];
+        members: [
+          {
+            character: {
+              name: string;
+            };
+            specialization: {
+              name: string;
+            };
+            race: {
+              name: string;
+            };
+            equippedItemLevel: number;
+          },
+        ];
+        dungeon: {
+          name: string;
+          id: number;
+        };
+        is_completed_within_time: boolean;
+        mythic_rating: {
+          rating: number;
+        };
+      },
+    ];
+    mythic_rating: {
+      rating: number;
+    };
   };
-}
-
-export interface characterSpecializationsResponse {
   specializations: [
     {
       specialization: {
@@ -107,30 +111,16 @@ export interface characterSpecializationsResponse {
       ];
     },
   ];
-}
-
-export interface characterGearResponse {
-  equipped_items: [
+  assets: [
     {
-      item: {
-        id: number;
-      };
-      name: string;
+      key: string;
+      value: string;
     },
   ];
 }
 
-export interface asset {
-  key: string;
-  value: string;
-}
-
-export interface characterMediaResponse {
-  assets: Array<asset>;
-}
-
-export interface BlizzardAccessToken {
-  AccessToken: string;
-  TokenType: string;
-  ExpiresIn: number;
-}
+export type CharacterContextType = {
+  characters: ICharacter[];
+  saveCharacter: (character: ICharacter) => void;
+  updateCharacter: (id: string) => void;
+};

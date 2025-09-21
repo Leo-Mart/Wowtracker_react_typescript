@@ -1,4 +1,4 @@
-import type { BlizzardAccessToken } from "../models/blizzardAccessToken.ts";
+import type { BlizzardAccessToken } from "../types/types.ts";
 
 type ResponseAccessToken = {
   access_token: string;

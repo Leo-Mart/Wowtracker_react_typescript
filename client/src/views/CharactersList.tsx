@@ -1,31 +1,11 @@
+import { use } from "react";
 import { Link } from "react-router";
 import CharacterCard from "../components/CharacterCard";
+import { CharacterContext } from "../context/CharacterContext";
+import type { CharacterContextType } from "../types/character";
 
 const CharactersList = () => {
-  const characters = [
-    {
-      name: "Ordos",
-      level: 80,
-      realm: "Shadowsong",
-      playerClass: "Priest",
-      avatarImg: "src/assets/images/avatar.jpg",
-    },
-    {
-      name: "Ashir",
-      level: 80,
-      realm: "Shadowsong",
-      playerClass: "Priest",
-      avatarImg: "src/assets/images/avatar.jpg",
-    },
-
-    {
-      name: "Oredos",
-      level: 80,
-      realm: "Shadowsong",
-      playerClass: "Shaman",
-      avatarImg: "src/assets/images/avatar.jpg",
-    },
-  ];
+  const { characters } = use(CharacterContext) as CharacterContextType;
   return (
     <section className="min-h-screen dark:bg-gray-900">
       <ul className="grid grid-cols-6 gap-3 px-8">
@@ -35,9 +15,8 @@ const CharactersList = () => {
               <CharacterCard
                 name={character.name}
                 level={character.level}
-                realm={character.realm}
-                playerClass={character.playerClass}
-                avatarImg={character.avatarImg}
+                playerClass={character.character_class.name}
+                avatarImg={character.assets[0].value}
               />
             </Link>
           </li>
