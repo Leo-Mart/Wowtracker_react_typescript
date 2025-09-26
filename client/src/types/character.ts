@@ -1,4 +1,5 @@
 export interface ICharacter {
+  _id: string;
   name: string;
   level: number;
   equipped_item_level: number;
@@ -23,7 +24,7 @@ export interface ICharacter {
     },
   ];
   keystoneProfileCurrentSeason: {
-    bestRuns: [
+    best_runs: [
       {
         completed_timestamp: number;
         duration: number;

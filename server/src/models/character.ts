@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface ICharacter extends Document {
+  _id: mongoose.Types.ObjectId;
   name: string;
   level: number;
   equipped_item_level: number;
@@ -141,15 +142,18 @@ const characterSchema: Schema = new Schema<ICharacter>({
   },
   specializations: [
     {
+      _id: false,
       specialization: {
         name: { type: String },
       },
       loadouts: [
         {
+          _id: false,
           is_active: { type: Boolean },
           talent_loadout_code: { type: String },
           selected_class_talents: [
             {
+              _id: false,
               tooltip: {
                 spell_tooltip: {
                   spell: {
@@ -162,6 +166,7 @@ const characterSchema: Schema = new Schema<ICharacter>({
           ],
           selected_spec_talents: [
             {
+              _id: false,
               tooltip: {
                 spell_tooltip: {
                   spell: {
@@ -174,6 +179,7 @@ const characterSchema: Schema = new Schema<ICharacter>({
           ],
           selected_hero_talents: [
             {
+              _id: false,
               tooltip: {
                 spell_tooltip: {
                   spell: {
@@ -190,6 +196,7 @@ const characterSchema: Schema = new Schema<ICharacter>({
   ],
   character_gear: [
     {
+      _id: false,
       item: {
         id: { type: Number },
       },
@@ -199,6 +206,7 @@ const characterSchema: Schema = new Schema<ICharacter>({
   keystoneProfileCurrentSeason: {
     best_runs: [
       {
+        _id: false,
         completed_timestamp: { type: Number },
         duration: { type: Number },
         keystone_level: { type: Number },
@@ -238,6 +246,7 @@ const characterSchema: Schema = new Schema<ICharacter>({
   },
   assets: [
     {
+      _id: false,
       key: { type: String },
       value: { type: String },
     },

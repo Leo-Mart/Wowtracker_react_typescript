@@ -10,8 +10,8 @@ const CharactersList = () => {
     <section className="min-h-screen dark:bg-gray-900">
       <ul className="grid grid-cols-6 gap-3 px-8">
         {characters.map((character) => (
-          <li key={character.name}>
-            <Link to={`/character/${character.name}`}>
+          <li key={character._id}>
+            <Link to={`/character/${character._id}`}>
               <CharacterCard
                 name={character.name}
                 level={character.level}
